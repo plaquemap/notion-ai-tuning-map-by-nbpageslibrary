@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIチューニング関係図（2次元軸）</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .chart {
+            position: relative;
+            width: 1200px;
+            height: 800px;
+            margin: 30px auto;
+            border: 2px solid #ddd;
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .axis {
+            position: absolute;
+            background: #2c3e50;
+        }
+        .x-axis {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            left: 0;
+        }
+        .y-axis {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+        }
+        .axis-label {
+            position: absolute;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .x-label-left { left: 20px; top: 55%; }
+        .x-label-right { right: 20px; top: 55%; }
+        .y-label-top { left: 52%; top: 20px; }
+        .y-label-bottom { left: 52%; bottom: 20px; }
+        
+        .ai-node {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+        }
+        .ai-node:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        
+        .notion-enhanced {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: 3px solid #f39c12;
+        }
+        .base-ai {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .ai-node:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #e74c3c);
+            z-index: 1;
+            opacity: 0.6;
+        }
+        .connection::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #e74c3c;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border-radius: 20px;
+        }
+        .legend-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .quadrant-label {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: #7f8c8d;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AIチューニング関係図（2次元分析）</h1>
+        <p class="subtitle">実務性 vs 理論性 × 個人レベル vs 社会レベル</p>
+        
+        <div class="chart">
+            <!-- Axes -->
+            <div class="axis x-axis"></div>
+            <div class="axis y-axis"></div>
+            
+            <!-- Axis Labels -->
+            <div class="axis-label x-label-left">実務的・具体的</div>
+            <div class="axis-label x-label-right">理論的・抽象的</div>
+            <div class="axis-label y-label-top">社会・制度レベル</div>
+            <div class="axis-label y-label-bottom">個人・実践レベル</div>
+            
+            <!-- Quadrant Labels -->
+            <div class="quadrant-label" style="top: 100px; left: 150px;">社会実務</div>
+            <div class="quadrant-label" style="top: 100px; right: 150px;">社会理論</div>
+            <div class="quadrant-label" style="bottom: 100px; left: 150px;">個人実務</div>
+            <div class="quadrant-label" style="bottom: 100px; right: 150px;">個人理論</div>
+            
+            <!-- Notion-Enhanced AIs (A-F) -->
+            <div class="ai-node notion-enhanced" style="left: 25%; top: 75%;" data-ai="A">
+                A
+                <div class="tooltip">Notion AI+Workspace<br/>デジタル手段重視</div>
+            </div>
+            
+            <div class="ai-node notion-enhanced" style="left: 20%; top: 60%;" data-ai="B">
+                B
+                <div class="tooltip">OpenAI GPT 4.1/Notion<br/>実務ツール集</div>
+            </div>
+            
+            <div class="ai-node notion-enhanced" style="left: 30%; top: 45%;" data-ai="C">
+                C
+                <div class="tooltip">Claude Sonnet 4/Notion<br/>活用・体験重視</div>
+            </div>
+            
+            <div class="ai-node notion-enhanced" style="left: 35%; top: 35%;" data-ai="D">
+                D
+                <div class="tooltip">Claude Opus 4/Notion<br/>システム構築</div>
+            </div>
+            
+            <div class="ai-node notion-enhanced" style="left: 25%; top: 25%;" data-ai="E">
+                E
+                <div class="tooltip">Gemini 2.5 Flash/Notion<br/>保存・信頼性</div>
+            </div>
+            
+            <div class="ai-node notion-enhanced" style="left: 15%; top: 80%;" data-ai="F">
+                F
+                <div class="tooltip">Gemini 2.5 Pro/Notion<br/>個人実践</div>
+            </div>
+            
+            <!-- Base AIs (G-K) -->
+            <div class="ai-node base-ai" style="left: 75%; top: 60%;" data-ai="G">
+                G
+                <div class="tooltip">OpenAI GPT 4.1<br/>原理・判断基準</div>
+            </div>
+            
+            <div class="ai-node base-ai" style="left: 70%; top: 25%;" data-ai="H">
+                H
+                <div class="tooltip">Claude Sonnet 4<br/>制度・保存重視</div>
+            </div>
+            
+            <div class="ai-node base-ai" style="left: 85%; top: 35%;" data-ai="I">
+                I
+                <div class="tooltip">Claude Opus 4<br/>コミュニティ実践</div>
+            </div>
+            
+            <div class="ai-node base-ai" style="left: 75%; top: 25%;" data-ai="J">
+                J
+                <div class="tooltip">Gemini 2.5 Flash<br/>伝達・普及</div>
+            </div>
+            
+            <div class="ai-node base-ai" style="left: 85%; top: 80%;" data-ai="K">
+                K
+                <div class="tooltip">Gemini 2.5 Pro<br/>社会制度</div>
+            </div>
+            
+
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-circle notion-enhanced" style="border: 3px solid #f39c12;"></div>
+                <span>Notion統合AI（実務特化）</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-circle base-ai"></div>
+                <span>ベースAI（理論特化）</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced interactivity
+        document.querySelectorAll('.ai-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.zIndex = '15';
+                // Highlight connected nodes
+                const aiLetter = this.dataset.ai;
+                document.querySelectorAll('.ai-node').forEach(other => {
+                    if (other.dataset.ai !== aiLetter) {
+                        other.style.opacity = '0.3';
+                    }
+                });
+            });
+            
+            node.addEventListener('mouseleave', function() {
+                this.style.zIndex = '5';
+                // Reset all nodes
+                document.querySelectorAll('.ai-node').forEach(other => {
+                    other.style.opacity = '1';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
